@@ -11,6 +11,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 
 const API_KEY = process.env.TETHER_E2E_API_KEY || process.env.TETHER_API_KEY;
 const API_BASE = process.env.TETHER_E2E_API_BASE_URL || process.env.TETHER_API_BASE_URL || 'https://api.tether.name';
+const TRACK = process.env.E2E_TRACK || 'stable';
 const SUFFIX = `${Math.floor(Date.now() / 1000)}-${process.pid}`;
 const CLI_BIN = path.resolve('node_modules/.bin/tether');
 
@@ -343,6 +344,7 @@ async function main() {
     const summary = {
       ok: Object.values(results).every((r) => r.pass === true),
       timestamp: new Date().toISOString(),
+      track: TRACK,
       apiBase: API_BASE,
       lifecycleAgentId,
       results,
@@ -359,6 +361,7 @@ async function main() {
       '# tether-name-e2e summary',
       '',
       `- ok: **${summary.ok}**`,
+      `- track: \`${summary.track}\``,
       `- apiBase: \`${summary.apiBase}\``,
       `- lifecycleAgentId: \`${summary.lifecycleAgentId}\``,
       '',

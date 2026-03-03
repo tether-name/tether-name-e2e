@@ -50,6 +50,18 @@ Triggers:
 - `workflow_dispatch` (manual)
 - nightly schedule
 
+The workflow runs two lanes:
+- `stable` (pinned versions)
+- `latest` (latest packages at runtime)
+
+## Version strategy
+
+- Stable lane uses pinned versions for deterministic signal:
+  - Node SDK/CLI/MCP from lockfile
+  - Python SDK: `2.0.3`
+  - Go SDK: `v1.0.7`
+- Latest lane upgrades SDK/CLI/MCP packages at runtime to catch forward-compat issues early.
+
 ## Safety notes
 
 - This repo is public; never commit API keys.

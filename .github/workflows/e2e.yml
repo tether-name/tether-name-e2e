@@ -12,13 +12,22 @@ concurrency:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     permissions:
       contents: read
+
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        track: [stable, latest]
 
     env:
       TETHER_E2E_API_KEY: ${{ secrets.TETHER_E2E_API_KEY }}
       TETHER_E2E_API_BASE_URL: https://api.tether.name
+      E2E_TRACK: ${{ matrix.track }}
+      PYTHON_SDK_STABLE_VERSION: '2.0.3'
+      GO_SDK_STABLE_VERSION: 'v1.0.7'
 
     steps:
       - name: Checkout
@@ -47,14 +56,37 @@ jobs:
             exit 1
           fi
 
-      - name: Install Node deps
+      - name: Install Node deps (stable)
+        if: matrix.track == 'stable'
         run: npm ci
 
-      - name: Install Python deps
-        run: python -m pip install --upgrade pip && pip install tether-name
+      - name: Install Node deps (latest)
+        if: matrix.track == 'latest'
+        run: |
+          npm ci
+          npm install --no-save tether-name@latest tether-name-cli@latest tether-name-mcp-server@latest @modelcontextprotocol/sdk@latest
 
-      - name: Download Go deps
+      - name: Install Python deps (stable)
+        if: matrix.track == 'stable'
+        run: |
+          python -m pip install --upgrade pip
+          pip install "tether-name==${PYTHON_SDK_STABLE_VERSION}"
+
+      - name: Install Python deps (latest)
+        if: matrix.track == 'latest'
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade tether-name
+
+      - name: Prepare Go deps (stable)
+        if: matrix.track == 'stable'
         run: go mod download
+
+      - name: Prepare Go deps (latest)
+        if: matrix.track == 'latest'
+        run: |
+          go get github.com/tether-name/tether-name-go@latest
+          go mod download
 
       - name: Run cross-sdk e2e
         run: npm run e2e
@@ -63,7 +95,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-summary
+          name: e2e-summary-${{ matrix.track }}
           path: |
             e2e-summary.json
             e2e-summary.md
@@ -71,6 +103,7 @@ jobs:
       - name: Add summary to workflow
         if: always()
         run: |
+          echo "## Cross-SDK E2E (${E2E_TRACK})" >> "$GITHUB_STEP_SUMMARY"
           if [ -f e2e-summary.md ]; then
             cat e2e-summary.md >> "$GITHUB_STEP_SUMMARY"
           fi
