@@ -112,7 +112,8 @@ function runCommand(cmd, args, { env = {}, retries = 3, cwd = process.cwd() } = 
       continue;
     }
 
-    throw new Error(`command failed: ${cmd} ${args.join(' ')}\n${combined}`);
+    const errMsg = proc.error ? `\nspawnError: ${proc.error.message}` : '';
+    throw new Error(`command failed: ${cmd} ${args.join(' ')}\n${combined}${errMsg}`);
   }
 
   throw new Error(`command retries exhausted: ${cmd}`);

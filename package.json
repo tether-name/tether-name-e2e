@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
-    "tether-name": "^2.0.3"
+    "tether-name": "^2.0.3",
+    "tether-name-cli": "^2.0.6",
+    "tether-name-mcp-server": "^2.0.6"
   }
 }
