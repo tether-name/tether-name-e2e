@@ -1,0 +1,14 @@
+{
+  "name": "tether-name-e2e",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Cross-ecosystem end-to-end smoke tests for tether.name",
+  "type": "module",
+  "scripts": {
+    "e2e": "node scripts/run-e2e.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "tether-name": "^2.0.3"
+  }
+}
